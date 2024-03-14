@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthController extends Controller
 {    public function register(Request $request)
     {
-        $data = $request->only(['name', 'email', 'password']);
+        $data = $request->only(['name', 'email', 'password', 'birthday', 'genre']);
         $validator = Validator::make($data, [
             'name' => [
                 'required',
@@ -27,7 +27,15 @@ class AuthController extends Controller
                 'string',
                 'min:6',
                 'max:50'
-            ]
+            ],
+            'birthday' => [
+                'required',
+                'date'
+            ],
+            'genre' => [
+                'required',
+                'string'
+            ],
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -38,6 +46,8 @@ class AuthController extends Controller
         User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'birthday' => $data['birthday'],
+            'genre' => $data['genre'],
             'password' => bcrypt($data['password'])
         ]);
         $credentials = $request->only(['email', 'password']);

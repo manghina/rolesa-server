@@ -15,13 +15,13 @@ return [
     |
     */
 
+
     'paths' => ['*'],
 
     'allowed_methods' => ['*'],
 
     'Access-Control-Allow-Origin' => ['*'],
 
-    // 'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:4200')],
     'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
