@@ -2,16 +2,19 @@
 
 namespace App\Http\API\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use Exception;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
-{    public function register(Request $request)
+{
+    public function register(Request $request)
     {
-        $data = $request->only(['name', 'email', 'password', 'birthday', 'genre']);
+        $data = $request->only(['name', 'email', 'password', 'birthday', 'genre','surname']);
         $validator = Validator::make($data, [
             'name' => [
                 'required',
@@ -45,10 +48,16 @@ class AuthController extends Controller
         }
         User::create([
             'name' => $data['name'],
+            'surname' => $data['surname'],
             'email' => $data['email'],
             'birthday' => $data['birthday'],
             'genre' => $data['genre'],
-            'password' => bcrypt($data['password'])
+            'password' => bcrypt($data['password']),
+            'phone' => '',
+            'country' => '',
+            'state' => '',
+            'city' => '',
+            'bio' => '',
         ]);
         $credentials = $request->only(['email', 'password']);
         if (!$token = auth('api')->attempt($credentials)) {
@@ -72,6 +81,7 @@ class AuthController extends Controller
 
     public function user()
     {
+
         return response()->json(auth('api')->user());
     }
 
@@ -87,7 +97,6 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(auth('api')->refresh());
     }
-
     protected function respondWithToken($token)
     {
         return response()->json([
@@ -95,5 +104,76 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => config('jwt.ttl') * 60
         ]);
+    }
+    public function redirectToAuth($provider)
+    {
+        $validated = $this->validateProvider($provider);
+        if (!is_null($validated)) {
+            return $validated;
+        }
+        return response()->json([
+            'url' => Socialite::driver($provider)
+                         ->stateless()
+                         ->redirect()
+                         ->getTargetUrl(),
+            'status' => Response::HTTP_OK
+        ]);
+    }
+    public function handleAuthCallback($provider)
+    {
+        $validated  = $this->validateProvider($provider);
+        if (!is_null($validated)) {
+                return $validated;
+        }
+        try {
+            $user = Socialite::driver($provider)->stateless()->user();
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Invalid  credentails']);
+        }
+        $now = now();
+        $userCreated = User::firstOrCreate(
+            [
+                'email' => $user->getEmail()
+            ],
+            [
+                'email_verified_at' => now(),
+                'name' => $user->getName(),
+                'status' => true,
+                'surname' => '',
+                'birthday' => $now,
+                'genre' => ' ',
+                'password' => '112wdd2q4:/',
+                'phone' => ' ',
+                'country' => ' ',
+                'state' => ' ',
+                'city' => ' ',
+                'bio' => ' ',
+            ]
+        );
+        $userCreated->providers()->updateOrCreate(
+            [
+                'provider' => $provider,
+                'provider_id' => $user->getId(),
+            ],
+            [
+                'avatar' => $user->getAvatar()
+            ]
+        );
+        $credentials = ['email' => $user->getEmail() , 'password' => '112wdd2q4:/'];
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+        return $this->respondWithToken($token);
+        //$token = $userCreated->createToken('google-token')->plainTextToken;
+
+        //return $this->respondWithToken($token);
+    }
+    protected function validateProvider($provider)
+    {
+        if (!in_array($provider, ['google'])) {
+            return response()->json(['error' => 'Please login with google' , 422 ]);
+        }
     }
 }
