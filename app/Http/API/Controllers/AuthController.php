@@ -126,9 +126,11 @@ class AuthController extends Controller
                 return $validated;
         }
         try {
-            $user = Socialite::driver($provider)->stateless()->user();
+            $user = Socialite::driver('google')->stateless()->user();
         } catch (Exception $e) {
-            return response()->json(['error' => 'Invalid  credentails']);
+            
+          //  return response()->json(['error' => 'Invalid  credentails']);
+            return response()->json(['error' => $e->getMessage()]);
         }
         $now = now();
         $userCreated = User::firstOrCreate(
@@ -166,9 +168,6 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
         return $this->respondWithToken($token);
-        //$token = $userCreated->createToken('google-token')->plainTextToken;
-
-        //return $this->respondWithToken($token);
     }
     protected function validateProvider($provider)
     {
