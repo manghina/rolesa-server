@@ -1,16 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MailController;
-
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     return response()->json(['success' => 'false'], 401);
 })->name('login');
 
-Route::post('test-route', function () {
-    return  "We are learning Laravel 10 mail from laravelia.com";
-});
 
-// Route::get('sendhtmlemail','MailController@html_email');
+ Route::get('test',[CategoryController::class, 'send']);
 // Route::get('sendattachmentemail','MailController@attachment_email');
