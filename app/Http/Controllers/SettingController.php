@@ -28,7 +28,9 @@ class SettingController extends Controller
             'data' => $settings
         ], 200);
     }
-
+    public function test() {
+        return "test ok";
+    }
     public function get($id)
     {
         $setting = Setting::where('id', $id)->get();
