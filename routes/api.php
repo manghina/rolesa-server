@@ -27,5 +27,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('user', [AuthController::class, 'user']);
     Route::get('settings/{user_id}', [SettingController::class, 'all']);
-    Route::get('settings/test', [SettingController::class, 'test']);
+    Route::get('settingstest', [SettingController::class, 'test']);
 });
