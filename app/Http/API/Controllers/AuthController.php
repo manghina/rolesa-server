@@ -1,15 +1,17 @@
 <?php
 
 namespace App\Http\API\Controllers;
-
-use App\Models\User;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Exception;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
+use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
+use App\Mail\Mailer;
+use App\Models\User;
 class AuthController extends Controller
 {
     public function register(Request $request)
@@ -46,10 +48,11 @@ class AuthController extends Controller
                     ->toArray()
             ], Response::HTTP_BAD_REQUEST);
         }
-        User::create([
+        $user = User::create([
             'name' => $data['name'],
             'surname' => $data['surname'],
             'email' => $data['email'],
+            'email_verified_token' => Str::random(40),
             'birthday' => $data['birthday'],
             'genre' => $data['genre'],
             'password' => bcrypt($data['password']),
@@ -59,6 +62,11 @@ class AuthController extends Controller
             'city' => '',
             'bio' => '',
         ]);
+//        $mail = new Mailer($user->email_verified_token);
+//        $mail->subject('Email Verification')->view('mail.test-email', ['user' => $user]);
+//        Mail::to($data['email'], 'won')
+//            ->send($mail);
+
         $credentials = $request->only(['email', 'password']);
         if (!$token = auth('api')->attempt($credentials)) {
             return response()->json([
