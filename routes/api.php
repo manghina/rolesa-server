@@ -10,6 +10,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\API\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingController;
 
 //Route::get('sendhtmlemail','MailController@html_email');
@@ -25,7 +26,9 @@ Route::get('auth/{provider}/callback', [AuthController::class, 'handleAuthCallba
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('user', [AuthController::class, 'user']);
+    Route::get('users', [UserController::class, 'all']);
+    Route::get('user/{id}', [UserController::class, 'get']);
+    Route::post('user', [UserController::class, 'update']);
     Route::get('settings/{user_id}', [SettingController::class, 'all']);
     Route::get('settingstest', [SettingController::class, 'test']);
 });

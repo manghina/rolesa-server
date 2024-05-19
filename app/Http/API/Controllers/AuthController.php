@@ -76,7 +76,8 @@ class AuthController extends Controller
                 'error' => 'Unauthorized'
             ], Response::HTTP_UNAUTHORIZED);
         }
-        return $this->respondWithToken($token);
+        $user = User::where("email", $request->get('email'))->get();
+        return $this->respondWithToken($token, $user[0]);
     }
 
     public function user()
@@ -97,10 +98,11 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(auth('api')->refresh());
     }
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $user = null)
     {
         return response()->json([
             'access_token' => $token,
+            'user' => $user,
             'token_type' => 'bearer',
             'expires_in' => config('jwt.ttl') * 60
         ]);
