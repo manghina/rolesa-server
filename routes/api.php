@@ -10,10 +10,9 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\API\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\PostController;
 
-//Route::get('sendhtmlemail','MailController@html_email');
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -26,15 +25,9 @@ Route::get('auth/{provider}/callback', [AuthController::class, 'handleAuthCallba
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('user', [AuthController::class, 'user']);
-    Route::post('user/update', [SettingController::class, 'updateProfile']);
+    Route::get('users', [UserController::class, 'all']);
+    Route::get('user/{id}', [UserController::class, 'get']);
+    Route::post('user', [UserController::class, 'update']);
     Route::get('settings/{user_id}', [SettingController::class, 'all']);
     Route::get('settingstest', [SettingController::class, 'test']);
-    Route::prefix('posts')->group(function () {
-        Route::post('/store', [PostController::class, 'store']);
-        Route::post('/{id}/comment', [PostController::class, 'comment']);
-        Route::get('/', [PostController::class, 'all']);
-        Route::get('/my', [PostController::class, 'myposts']);
-    });
-    //controller(PostController::class)->
 });

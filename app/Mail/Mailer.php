@@ -30,10 +30,8 @@ class Mailer extends Mailable
      */
     public function envelope()
     {
-//        dd($this->data);
         return new Envelope(
-//            subject: $this->data['subject'],
-                subject: 'example'
+            subject: $this->data['subject'],
         );
     }
 
@@ -45,9 +43,8 @@ class Mailer extends Mailable
     public function content()
     {
         return new Content(
-//            view:  $this->data['view'],
-            view:  'mail.test-email',
-//            with: ['name' =>  $this->data['name']],
+            view:  $this->data['view'],
+            with: ['name' =>  $this->data['name']],
         );
     }
 
