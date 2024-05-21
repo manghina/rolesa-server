@@ -10,9 +10,9 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-    public function store(Request $request)
+    public function create(Request $request)
     {
-        $data = $request->only(['title', 'description', 'location']);
+        $data = $request->only(['title', 'description', 'location', 'author', 'parent_id', 'category']);
         $validator = Validator::make($data, [
             'title' => [
                 'required',
@@ -37,8 +37,39 @@ class PostController extends Controller
             'title' => $data['title'],
             'description' => $data['description'],
             'location' => $data['location'],
+            'parent_id' => $data['parent_id'],
+            'category' => $data['category'],
             'author' => auth('api')->user()->id,
         ]);
+        return response()->json($post, 200);
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->only(['id', 'title', 'description', 'location', 'author', 'parent_id', 'category']);
+        $validator = Validator::make($data, [
+            'title' => [
+                'required',
+                'string'
+            ],
+            'description' => [
+                'required',
+                'string'
+            ],
+            'location' => [
+                'required',
+                'string'
+            ]
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->getMessageBag()
+                    ->toArray()
+            ], Response::HTTP_BAD_REQUEST);
+        }        
+        $post = Post::find($data['id'])->get()[0];
+        $post->fill($request->all());
+        $post->save();
         return response()->json($post, 200);
     }
 
@@ -77,11 +108,7 @@ class PostController extends Controller
                     ->toArray()
             ], Response::HTTP_BAD_REQUEST);
         }
-        $comment = Post::create([
-            'description' => $data['description'],
-            'parent_id' => $id,
-            'author' => auth('api')->user()->id,
-        ]);
+        $comment = Post::create();
         return response()->json($comment, 200);
     }
 

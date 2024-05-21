@@ -32,7 +32,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('settings/{user_id}', [SettingController::class, 'all']);
     Route::get('settingstest', [SettingController::class, 'test']);
     Route::prefix('posts')->group(function () {
-        Route::post('/store', [PostController::class, 'store']);
+        Route::put('/', [PostController::class, 'create']);
+        Route::post('/', [PostController::class, 'update']);
         Route::post('/{id}/comment', [PostController::class, 'comment']);
         Route::get('/', [PostController::class, 'all']);
         Route::get('/my', [PostController::class, 'myposts']);
