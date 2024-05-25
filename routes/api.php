@@ -13,6 +13,7 @@ use App\Http\API\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\MessageController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -37,5 +38,10 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/comment', [PostController::class, 'comment']);
         Route::get('/', [PostController::class, 'all']);
         Route::get('/my', [PostController::class, 'myposts']);
+    });
+    Route::prefix('message')->group(function () {
+        Route::put('/', [MessageController::class, 'create']);
+        Route::post('/', [MessageController::class, 'update']);
+        Route::get('/{id}', [MessageController::class, 'all']);
     });
 });
