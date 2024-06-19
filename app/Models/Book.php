@@ -9,16 +9,17 @@ use App\Models\User;
 class Message extends Model
 {
     use HasFactory;
-    public $table = "message";
+    public $table = "books";
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'msg',
-        'post',
-        'author'
+        'name',
+        'description',
+        'photo',
+        'price'
     ];
 
     public function user()

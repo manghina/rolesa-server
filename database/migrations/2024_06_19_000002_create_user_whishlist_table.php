@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('settings', function (Blueprint $table) {
-            $table->integer('user_id');
+        Schema::create('whishlist', function (Blueprint $table) {
+            $table->id();
+            $table->string('user_id')->unique();
+            $table->string('book_id');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('settings', function($table) {
-            $table->dropColumn('user_id');
-        });
+        Schema::dropIfExists('whishlist');
     }
 };
